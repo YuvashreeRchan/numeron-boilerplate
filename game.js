@@ -1,96 +1,69 @@
-// Iteration 2: Generate 2 random number and display it on the screen
 
-function randomNumber()
-{
-    return Math.round(Math.random() * 100);
+let num1;
+let num2;
+
+const num1Element = document.getElementById("number1");
+const num2Element = document.getElementById("number2");
+
+const timerElement = document.getElementById("timer");
+
+let score = 0;
+let intervalId;
+let timeRemaining;
+
+function randomNumber() {
+  return Math.floor(Math.random() * 100) + 1;
 }
 
-var number1 = randomNumber();
-const number1box = document.getElementById("number1");
-number1box.innerHTML = number1;
-
-var number2 = randomNumber();
-const number2box = document.getElementById("number2");
-number2box.innerHTML = number2;
-
-
-// Iteration 3: Make the options button functional
-const greaterThan = document.getElementById("greater-than");
-const equalTo = document.getElementById("equal-to");
-const lesserThan = document.getElementById("lesser-than");
-
-var score = 0;
-
-greaterThan.onclick = () => 
+// Build a timer for the game
+function startInterval()
 {
-    if (number1 > number2) {
-        score++;
-        resetTime(timerId);
-    } else {
-        location.href = "./gameover.html";
-    }
-
-    number1 = randomNumber();
-    number1box.innerHTML = number1;
-    number2 = randomNumber();
-    number2box.innerHTML = number2;
-
-}
-
-lesserThan.onclick = () => 
-{
-    if (number1 < number2) 
+    intervalId = setInterval(() => 
     {
-        score++;
-        resetTime(timerId);
-    } else {
-        location.href = "./gameover.html";
-    }
-    number1 = randomNumber();
-    number1box.innerHTML = number1;
-    number2 = randomNumber();
-    number2box.innerHTML = number2;
-};
-
-equalTo.onclick = () => 
-{
-    if (number1 == number2)
-    {
-        score++;
-        resetTime(timerId);
-    } else {
-        location.href = "./gameover.html";
-    }
-    number1 = randomNumber();
-    number1box.innerHTML = number1;
-    number2 = randomNumber();
-    number2box.innerHTML = number2;
-};
-
-// Iteration 4: Build a timer for the game
-
-var time = 5;
-var timer = document.getElementById("timer");
-var timerId;
-
-function startTimer() {
-    time = 5;
-    timer.innerHTML = time;
-    timerId = setInterval(() => 
-    {
-        time--;
-        if (time == 0) {
-        location.href = "./gameover.html";
-        }
-        timer.innerHTML = time;
+        timeRemaining--;
+        timerElement.innerText = timeRemaining;
+        if (timeRemaining == 0) endGame();
     }, 1000);
+}
+
+function stopInterval() 
+{
+    clearInterval(intervalId);
+    timeRemaining = 5;
+    timerElement.innerText = timeRemaining;
+}
+
+function endGame() {
+    stopInterval();
+    window.location.href = "./gameover.html";
     localStorage.setItem("score", score);
 }
 
-function resetTime(intervalId) 
-{
-    clearInterval(intervalId);
-    startTimer();
+function displayRandomNumber() {
+    stopInterval();
+    num1 = randomNumber();
+    num2 = randomNumber();
+    num1Element.innerText = num1;
+    num2Element.innerText = num2;
+    startInterval();
 }
 
-startTimer();
+function compareNumber(operation) {
+if (
+    (operation == "greater-than" && num1 > num2) ||
+    (operation == "lesser-than" && num1 < num2) ||
+    (operation == "equal-to" && num1 === num2)
+    ) {
+        score++;
+        displayRandomNumber();
+    } else endGame();
+}
+
+displayRandomNumber();
+
+// Listen for clicks on the button container
+document.getElementById("buttons").addEventListener("click", (event) => 
+{
+    const operation = event.target.id;
+    compareNumber(operation);
+});
